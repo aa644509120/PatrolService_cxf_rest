@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="PatrolService_cxf_rest"
+  id="myeclipse.1401333463649"
+  context-root="/patrol"
+  j2ee-spec="5.0"
+  archive="PatrolService_cxf_rest.war">
+  <attributes>
+    <attribute name="webrootdir" value="/WebRoot" />
+  </attributes>
+</project-module>
+

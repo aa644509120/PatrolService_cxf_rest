@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	<!-- 每隔30分钟获取新浪的cookie -->
+	<bean id="cookieTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="reportInfoFileManager"/>
+		</property>
+		<property name="targetMethod">
+			<value>getCookie</value>
+		</property>
+		<property name="concurrent" value="false" />  <!-- 注意，这里要设置为false,设置不允许覆盖并发执行 -->
+	</bean>
+	<bean id="cookieTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="cookieTask"/>
+		</property>
+		<property name="cronExpression">
+			<!-- 每30分钟执行一次 -->
+			<value>0 0/30 * * * ?</value>
+		</property>
+	</bean>
+	<!-- END -->
+	
+	
+	<!-- 验证新浪的cookie -->
+	<bean id="cookieValidatorTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="reportInfoFileManager"/>
+		</property>
+		<property name="targetMethod">
+			<value>validatorSinaCookie</value>
+		</property>
+		<property name="concurrent" value="false" />  <!-- 注意，这里要设置为false,设置不允许覆盖并发执行 -->
+	</bean>
+	<bean id="cookieValidatorTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="cookieValidatorTask"/>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/1 * * * ?</value>
+		</property>
+	</bean>
+	<!-- END -->
+	
+	
+	<!-- 验证新浪的cookie -->
+	<bean id="keyFailTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="sysFailLogManager"/>
+		</property>
+		<property name="targetMethod">
+			<value>sycnKey</value>
+		</property>
+		<property name="concurrent" value="false" />  <!-- 注意，这里要设置为false,设置不允许覆盖并发执行 -->
+	</bean>
+	<bean id="keyFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="keyFailTask"/>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/3 * * * ?</value>
+		</property>
+	</bean>
+	<!-- END -->
+	
+	
+	<!-- 总管理器 启动工作 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<!-- 每隔30分钟获取新浪的cookie-->
+				<ref local="cookieTrigger" />
+				<!-- 每分钟验证新浪微博的相关cookie-->
+				<ref local="cookieValidatorTrigger" />
+				<!-- 每5分钟同步失败的关键词操作-->
+				<ref local="keyFailTrigger" />
+			</list>
+		</property>
+		<property name="configLocation" value="classpath:quartz.properties"/>
+	</bean>
+</beans>

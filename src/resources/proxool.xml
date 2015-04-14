@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something-else-entirely>
+  <proxool>
+    <alias>dbpool</alias>
+    <driver-url>jdbc:jtds:sqlserver://172.16.2.185:1433;DatabaseName=PatrolPlatform;useLOBs=false</driver-url>
+    <driver-class>net.sourceforge.jtds.jdbc.Driver</driver-class>
+    	<driver-properties>
+		<property name="user" value="sa" />
+		<property name="password" value="xmhkmygs" />
+	</driver-properties>
+	<minimum-connection-count>10</minimum-connection-count>
+	<maximum-connection-count>500</maximum-connection-count>
+	<prototype-count>1</prototype-count>
+	<test-before-use>true</test-before-use>
+	<house-keeping-test-sql>select getDate()</house-keeping-test-sql>
+	<house-keeping-sleep-time>90000</house-keeping-sleep-time>
+	<simultaneous-build-throttle>300</simultaneous-build-throttle>
+	<simultaneous-build-throttle>150</simultaneous-build-throttle>
+	<maximum-active-time>300000</maximum-active-time>
+	<maximum-connection-lifetime>14400000</maximum-connection-lifetime>
+  </proxool>
+</something-else-entirely>

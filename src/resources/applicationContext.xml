@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans default-lazy-init="true" xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:oxm="http://www.springframework.org/schema/oxm" 
+    xmlns:jaxws="http://cxf.apache.org/jaxws" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/jee
+    http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/oxm 
+    http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd 
+    http://cxf.apache.org/jaxws 
+    http://cxf.apache.org/schemas/jaxws.xsd
+    http://cxf.apache.org/jaxrs
+    http://cxf.apache.org/schemas/jaxrs.xsd"> 
+	
+    <description>public configuration file</description>
+	<context:component-scan base-package="com.meiah" />
+       
+    <import resource="classpath:META-INF/cxf/cxf.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" /> 
+    
+	<!-- define variables that are unconstant and easily change their values with the changing of environment -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName"
+			value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- Data source configuration,to set up the database connecting pool that will use the application server in the manufacturing settings -->
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="mappingLocations">
+			<list>
+				<value>
+					classpath:/com/meiah/entity/**/*.hbm.xml
+				</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.jdbc.batch_size">25</prop>
+				<prop key="hibernate.jdbc.fetch_size">50</prop>
+				<prop key="hibernate.generate_statistics">false</prop>
+				<prop key="hibernate.use_sql_comments">false</prop>
+				<prop key="hibernate.cache.use_structured_entries">
+					false
+				</prop>
+				<prop key="hibernate.query.factory_class">
+					org.hibernate.hql.ast.ASTQueryTranslatorFactory
+				</prop>
+<!--				 <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop> -->
+				 <prop key="hibernate.dialect">com.meiah.SQLServer2005Dialect</prop> 
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.EhCacheProvider
+				</prop>
+				<prop
+					key="hibernate.cache.provider_configuration_file_resource_path">
+					/ehcache.xml
+				</prop>
+				<prop key="hibernate.show_sql">
+					true
+				</prop>
+				<!-- 配置proxool连接池 -->  
+                <prop key="hibernate.proxool.pool_alias">dbpool</prop>  
+                <prop key="hibernate.proxool.xml">proxool.xml</prop> 
+                <prop key="hibernate.connection.provider_class">org.hibernate.connection.ProxoolConnectionProvider</prop>  
+			</props>
+		</property>
+		<property name="annotatedClasses">
+			<list></list>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="velocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath"
+			value="classpath:velocity">
+		</property>
+	</bean>
+       <bean  id="patrolService"  class="com.meiah.services.impl.PatrolServiceImpl" ></bean> 
+       <!-- #代表使用spring容器中的类 --> 
+      <jaxws:endpoint  implementor="#patrolService" address="/patrol" > 
+        <jaxws:inInterceptors> 
+            <bean class="com.meiah.auth.IPInterceptor"/>
+        </jaxws:inInterceptors> 
+    </jaxws:endpoint> 
+    <bean id="springContextUtil" class="com.meiah.core.util.SpringContextUtil" lazy-init="false" ></bean>
+</beans> 

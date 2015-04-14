@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Struts2Diagram version="2.0">
+  <package name="default" location="0,0" size="300,100" />
+  <package name="common" location="0,0" size="300,100">
+    <action name="tree" location="10,20" size="100,50" />
+    <action name="validateCode" location="10,20" size="100,50" />
+    <action name="login" location="10,20" size="100,50" />
+    <action name="logout" location="10,20" size="100,50" />
+  </package>
+  <package name="fckeditor" location="0,0" size="300,100">
+    <action name="connector" location="10,20" size="100,50" />
+  </package>
+  <include file="struts-dk.xml" location="0,0" size="150,30" />
+</Struts2Diagram>
+
